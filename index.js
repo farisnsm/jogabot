@@ -1,5 +1,5 @@
 const TelegramBot = require('node-telegram-bot-api');
-const token = '835638437:AAEohOJtEeV8ySk3J2P3gxb2DqqXwVHu2Ww';
+const token = '835638437:AAGmC_LDy_DmbRTxbIFkW_zC8A57LBc3gek';
 var moment = require('moment');
 const bot = new TelegramBot(token, { polling: true });
 var mysql = require('mysql2');
