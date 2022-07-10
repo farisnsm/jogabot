@@ -5,6 +5,7 @@ const bot = new TelegramBot(token, { polling: true });
 var mysql = require('mysql2');
 
 var connection = mysql.createPool({
+  connectionLimit : 100,
   host: 'eu-cdbr-west-03.cleardb.net',
   user: 'be0dbc49587e53',
   password: 'f7a660f5',
@@ -12,7 +13,6 @@ var connection = mysql.createPool({
   multipleStatements: true
 });
 
-connection.connect();
 
 function cancelTimeout(){
   connection.query('select 1', function (error, results, fields) {
