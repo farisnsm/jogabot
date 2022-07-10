@@ -4,7 +4,7 @@ var moment = require('moment');
 const bot = new TelegramBot(token, { polling: true });
 var mysql = require('mysql2');
 
-var connection = mysql.createConnection({
+var connection = mysql.createPool({
   host: 'eu-cdbr-west-03.cleardb.net',
   user: 'be0dbc49587e53',
   password: 'f7a660f5',
