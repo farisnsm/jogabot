@@ -90,7 +90,7 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
   let responderName = callbackQuery.from.first_name
   console.log(responderName, moment().format(),action)
   let date = msg.text.substring(10, 20)
-  let text = "Sooker on " + date + "\n8.00PM at The Arena @ PUB Rec Club\n-----------------"
+  let text = "Sooker on " + date + "\n8.30PM at Orto, Yishun\n-----------------"
   const opts = {
     chat_id: msg.chat.id,
     message_id: msg.message_id,
