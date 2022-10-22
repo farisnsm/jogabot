@@ -5,7 +5,7 @@ const bot = new TelegramBot(token, { polling: true });
 var mysql = require('mysql2');
 
 var connection = mysql.createPool({
-  connectionLimit : 100,
+  connectionLimit: 100,
   host: 'eu-cdbr-west-03.cleardb.net',
   user: 'be0dbc49587e53',
   password: 'f7a660f5',
@@ -14,11 +14,11 @@ var connection = mysql.createPool({
 });
 
 
-function cancelTimeout(){
+function cancelTimeout() {
   connection.query('select 1', function (error, results, fields) {
-    if (error) {console.log(error)} else {console.log(moment().format())}
+    if (error) { console.log(error) } else { console.log(moment().format()) }
   })
-  setTimeout(cancelTimeout, 1000*60*60);
+  setTimeout(cancelTimeout, 1000 * 60 * 60);
 }
 cancelTimeout()
 
@@ -35,6 +35,7 @@ function shuffleArray(array) {
 // Matches "/echo [whatever]"
 bot.on('message', (msg) => {
   const chatId = msg.chat.id;
+  let text = msg.text
   //console.log(msg)
   if (msg.from.id = '200418207' && msg.text.substring(0, 10) == 'create new') {
     bot.sendMessage(chatId, 'Creating new session: ' + msg.text.substring(11));
@@ -79,6 +80,20 @@ bot.on('message', (msg) => {
     });
 
   }
+
+  if (text == "/rating") {
+    connection.query("select * from attendance where userId != 'x' group by userId", function (error, results, fields) {
+      if (error) { console.log(error) } else {
+        let players = results.map(r => [{ text: r.name, callback_data: 'vote_' + r.userId + "_" + r.name}])
+        var options = {
+          reply_markup: JSON.stringify({
+            inline_keyboard: players
+          })
+        };
+        bot.sendMessage(msg.from.id,"Who's rating do you want to give?",options)
+      }
+    })
+  }
 });
 
 bot.on('callback_query', function onCallbackQuery(callbackQuery) {
@@ -88,7 +103,7 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
   const msg = callbackQuery.message;
   let responder = callbackQuery.from.id
   let responderName = callbackQuery.from.first_name
-  console.log(responderName, moment().format(),action)
+  console.log(responderName, moment().format(), action)
   let date = msg.text.substring(10, 20)
   let text = "Sooker on " + date + "\n8.30PM at Orto, Yishun\n-----------------"
   const opts = {
@@ -144,8 +159,8 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
     }
     if (action == 's') {
       date = msg.text.substring(19, 29)
-      connection.query("select * from teams where date = '"+date+"' and shuffle = '" + responder +"'",function(e,r,f){
-        if(r.length ==0){
+      connection.query("select * from teams where date = '" + date + "' and shuffle = '" + responder + "'", function (e, r, f) {
+        if (r.length == 0) {
           connection.query("insert into  teams values ('" + date + "','" + responder + "');select * from teams where date = '" + date + "' group by shuffle", function (error, results, fields) {
             if (error) throw error;
             bot.deleteMessage(opts.chat_id, opts.message_id)
