@@ -85,6 +85,7 @@ bot.on('message', (msg) => {
     connection.query("select * from attendance where userId != 'x' group by userId", function (error, results, fields) {
       if (error) { console.log(error) } else {
         let players = results.map(r => [{ text: r.name, callback_data: 'vote_' + r.userId + "_" + r.name}])
+        console.log(players)
         var options = {
           reply_markup: JSON.stringify({
             inline_keyboard: players
