@@ -82,6 +82,10 @@ bot.on('message', (msg) => {
 
   }
 
+  if (text == '/rating@joga_bot'){
+    bot.sendMessage(msg.chat.id,"/rating only works in a DM with the bot, go to t.me/joga_bot to give ratings")
+  }
+
   if (text == "/rating") {
     if(msg.chat.type != 'private'){
       bot.sendMessage(msg.chat.id,"/rating only works in a DM with the bot, go to t.me/joga_bot to give ratings")
