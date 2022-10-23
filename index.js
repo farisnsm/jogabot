@@ -82,45 +82,44 @@ bot.on('message', (msg) => {
 
   }
 
-  if (text == '/rating@joga_bot'){
-    bot.sendMessage(msg.chat.id,"/rating only works in a DM with the bot, go to t.me/joga_bot to give ratings")
+  if (text == '/rating@joga_bot') {
+    bot.sendMessage(msg.chat.id, "/rating only works in a DM with the bot, go to t.me/joga_bot to give ratings")
   }
 
-  if (msg.chat.type == 'private' && text == '/start'){
-      connection.query("select * from attendance a left join ranking r on r.telegramID = '"+chatId+"' and r.telegramID2 = a.userId where userId != 'x' group by userId order by rank desc", function (error, results, fields) {
-        if (error) { console.log(error) } else {
-          let players = []
-          let temp = []
-          results.forEach(r=>{
-            temp.push({ text: r.name + " (" + (r.rank ? r.rank : 0) + ")", callback_data: 'vote_' + r.userId + "_" + r.name })
-            if(temp.length == 3){
-              players.push(temp)
-              temp = []
-            }
+  if (msg.chat.type == 'private' && text == '/start') {
+    connection.query("select * from attendance a left join ranking r on r.telegramID = '" + chatId + "' and r.telegramID2 = a.userId where userId != 'x' group by userId order by rank desc", function (error, results, fields) {
+      if (error) { console.log(error) } else {
+        let players = []
+        let temp = []
+        results.forEach(r => {
+          temp.push({ text: r.name + " (" + (r.rank ? r.rank : 0) + ")", callback_data: 'vote_' + r.userId + "_" + r.name })
+          if (temp.length == 3) {
+            players.push(temp)
+            temp = []
+          }
+        })
+        players.push(temp)
+        var options = {
+          reply_markup: JSON.stringify({
+            inline_keyboard: players
           })
-          players.push(temp)
-          var options = {
-            reply_markup: JSON.stringify({
-              inline_keyboard: players
-            })
-          };
-          bot.sendMessage(msg.chat.id, "Who's rating do you want to give?\nYour current ratings for them is displayed beside their names", options)
-        }
-      })
-    }
+        };
+        bot.sendMessage(msg.chat.id, "Who's rating do you want to give?\nYour current ratings for them is displayed beside their names", options)
+      }
+    })
   }
 
   if (text == "/rating") {
-    if(msg.chat.type != 'private'){
-      bot.sendMessage(msg.chat.id,"/rating only works in a DM with the bot, go to t.me/joga_bot to give ratings")
+    if (msg.chat.type != 'private') {
+      bot.sendMessage(msg.chat.id, "/rating only works in a DM with the bot, go to t.me/joga_bot to give ratings")
     } else {
-      connection.query("select * from attendance a left join ranking r on r.telegramID = '"+chatId+"' and r.telegramID2 = a.userId where userId != 'x' group by userId order by rank desc", function (error, results, fields) {
+      connection.query("select * from attendance a left join ranking r on r.telegramID = '" + chatId + "' and r.telegramID2 = a.userId where userId != 'x' group by userId order by rank desc", function (error, results, fields) {
         if (error) { console.log(error) } else {
           let players = []
           let temp = []
-          results.forEach(r=>{
+          results.forEach(r => {
             temp.push({ text: r.name + " (" + (r.rank ? r.rank : 0) + ")", callback_data: 'vote_' + r.userId + "_" + r.name })
-            if(temp.length == 3){
+            if (temp.length == 3) {
               players.push(temp)
               temp = []
             }
@@ -137,19 +136,19 @@ bot.on('message', (msg) => {
     }
   }
 
-  if (rating.hasOwnProperty(chatId)){
-    if(isNaN(text) || text < 0 || text > 10){
+  if (rating.hasOwnProperty(chatId)) {
+    if (isNaN(text) || text < 0 || text > 10) {
       bot.sendMessage(chatId, "Invalid input. Rating aborted")
       delete rating[chatId]
     } else {
-      connection.query("insert into ranking values ('"+chatId+rating[chatId].userId+"','"+chatId+"','"+rating[chatId].userId+"','"+text+"') on duplicate key update rank = "+text, function (error, results, fields) {
+      connection.query("insert into ranking values ('" + chatId + rating[chatId].userId + "','" + chatId + "','" + rating[chatId].userId + "','" + text + "') on duplicate key update rank = " + text, function (error, results, fields) {
         if (error) { console.log(error) } else {
-          bot.sendMessage(chatId,"You have succesfully updated your rating for " + rating[chatId].userName+"\nType or Tap /rating to provide another")
+          bot.sendMessage(chatId, "You have succesfully updated your rating for " + rating[chatId].userName + "\nType or Tap /rating to provide another")
           delete rating[chatId]
         }
       })
     }
-    
+
   }
 });
 
@@ -195,7 +194,7 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
 
   if (actions[0] == 'vote') {
 
-    rating[responder] = {userName:actions[2],userId:actions[1]}
+    rating[responder] = { userName: actions[2], userId: actions[1] }
     bot.sendMessage(responder, "Please provide a rating for " + actions[2] + " from 0 (worst) to 10 (best)")
     bot.deleteMessage(opts.chat_id, opts.message_id)
   } else {
