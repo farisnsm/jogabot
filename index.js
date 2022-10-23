@@ -83,6 +83,7 @@ bot.on('message', (msg) => {
   }
 
   if (text == "/rating") {
+    console.log(msg)
     connection.query("select * from attendance a left join ranking r on r.telegramID = '"+chatId+"' and r.telegramID2 = a.userId where userId != 'x' group by userId order by rank desc", function (error, results, fields) {
       if (error) { console.log(error) } else {
         let players = []
