@@ -83,27 +83,30 @@ bot.on('message', (msg) => {
   }
 
   if (text == "/rating") {
-    console.log(msg)
-    connection.query("select * from attendance a left join ranking r on r.telegramID = '"+chatId+"' and r.telegramID2 = a.userId where userId != 'x' group by userId order by rank desc", function (error, results, fields) {
-      if (error) { console.log(error) } else {
-        let players = []
-        let temp = []
-        results.forEach(r=>{
-          temp.push({ text: r.name + " (" + (r.rank ? r.rank : 0) + ")", callback_data: 'vote_' + r.userId + "_" + r.name })
-          if(temp.length == 3){
-            players.push(temp)
-            temp = []
-          }
-        })
-        players.push(temp)
-        var options = {
-          reply_markup: JSON.stringify({
-            inline_keyboard: players
+    if(msg.chat.type != 'private'){
+      bot.sendMessage(msg.chat.id,"/rating only works in a DM with the bot, go to t.me/joga_bot to give ratings")
+    } else {
+      connection.query("select * from attendance a left join ranking r on r.telegramID = '"+chatId+"' and r.telegramID2 = a.userId where userId != 'x' group by userId order by rank desc", function (error, results, fields) {
+        if (error) { console.log(error) } else {
+          let players = []
+          let temp = []
+          results.forEach(r=>{
+            temp.push({ text: r.name + " (" + (r.rank ? r.rank : 0) + ")", callback_data: 'vote_' + r.userId + "_" + r.name })
+            if(temp.length == 3){
+              players.push(temp)
+              temp = []
+            }
           })
-        };
-        bot.sendMessage(msg.chat.id, "Who's rating do you want to give?\nYour current ratings for them is displayed beside their names", options)
-      }
-    })
+          players.push(temp)
+          var options = {
+            reply_markup: JSON.stringify({
+              inline_keyboard: players
+            })
+          };
+          bot.sendMessage(msg.chat.id, "Who's rating do you want to give?\nYour current ratings for them is displayed beside their names", options)
+        }
+      })
+    }
   }
 
   if (rating.hasOwnProperty(chatId)){
