@@ -1,5 +1,6 @@
 const TelegramBot = require('node-telegram-bot-api');
 const token = '835638437:AAGmC_LDy_DmbRTxbIFkW_zC8A57LBc3gek';
+//const token = '5764854026:AAGjK2oDy_NZaEaO4JzDrU2LaeOw5pBq3F4'
 var moment = require('moment');
 const bot = new TelegramBot(token, { polling: true });
 var mysql = require('mysql2');
@@ -32,13 +33,19 @@ function shuffleArray(array) {
   }
 }
 
+function random() {
+  return Math.random() * (1.05 - 0.95) + 0.95;
+}
 
+function ratingQuery(sessionDate) {
+  return ("SELECT *,avg(rank) avg FROM heroku_722cb8a7f7c7056.ranking r left join attendance a on a.userId = r.telegramID2 where telegramID2 in (select userId from attendance where date = '" + sessionDate + "') and telegramID in (select userId from attendance where date = '" + sessionDate + "') group by userId order by avg")
+}
 // Matches "/echo [whatever]"
 bot.on('message', (msg) => {
   const chatId = msg.chat.id;
   let text = msg.text
   //console.log(msg)
-  if (msg.from.id = '200418207' && msg.text.substring(0, 10) == 'create new') {
+  if (msg.text.substring(0, 10) == 'create new') {
     bot.sendMessage(chatId, 'Creating new session: ' + msg.text.substring(11));
     var options = {
       reply_markup: JSON.stringify({
@@ -50,35 +57,70 @@ bot.on('message', (msg) => {
     bot.sendMessage(chatId, "Sooker on " + msg.text.substring(11), options);
   }
 
-  if (msg.from.id = '200418207' && msg.text.substring(0, 12) == 'create teams') {
+  if (msg.text.substring(0, 12) == 'create teams') {
     let date = msg.text.substring(13)
     //console.log(date)
-    connection.query('select * from attendance where date = "' + date + '" order by userId', function (error, results, fields) {
-      shuffleArray(results)
-      let teamA = ""
-      let teamB = ""
-      let teamC = ""
-      let i = 0
-      results.forEach(row2 => {
-        i++
-        if (i % 3 == 0) {
-          teamA = teamA + row2.name + "\n"
-        } else if (i % 2 == 0) {
-          teamB = teamB + row2.name + "\n"
-        } else {
-          teamC = teamC + row2.name + "\n"
-        }
+    connection.query(ratingQuery(date), function (error, results, fields) {
+      let arr = results.map(r => ({ name: r.name, v: r.avg * random() }))
+      arr.sort((a, b) => a.v - b.v);
+      let b = []
+      let l = arr.length - 1
+      let L = l / 2;
+      for (var i = 0; i < L; i++) b.push(arr[l - i], arr[i]);
+      if (arr.length % 2) b.push(arr[i]);
+      let teams = [
+        { n: 'A', s: { a: 0, p: [] } },
+        { n: 'B', s: { a: 0, p: [] } },
+        { n: 'C', s: { a: 0, p: [] } }
+      ]
+      let alt = true
+      b.forEach(r => {
+        if(alt){
+          //good players
+          teams.sort((a, b) => (a.s.a - b.s.a) * ((5-a.s.p.length)/(5-a.s.p.length))) //get worst team
+          teams[0].s.p.push(r.name)
+          teams[0].s.a = ((teams[0].s.a * (teams[0].s.p.length-1)) + r.v)/(teams[0].s.p.length)
+          
+      } else {
+          teams.sort((a, b) => (b.s.a - a.s.a) * ((5-a.s.p.length)/(5-a.s.p.length))) //get best team
+          teams[0].s.p.push(r.name)
+          teams[0].s.a = ((teams[0].s.a * (teams[0].s.p.length-1)) + r.v)/(teams[0].s.p.length)
+      }
+        alt = !alt
+
       })
-      let res = teamA + "-------------\n" + teamB + "-------------\n" + teamC
-      var options = {
-        reply_markup: JSON.stringify({
-          inline_keyboard: [
-            [{ text: 'Shuffle Teams', callback_data: 's' }]
-          ]
-        })
-      };
-      bot.sendMessage(chatId, 'Creating teams for ' + date + "\nVotes to shuffle: 0\nNeed 4 votes to shuffle\n---------\n" + res, options);
-    });
+      let msg = "Teams for " + date
+      teams.sort((a, b) => a.n.charCodeAt(0) - b.n.charCodeAt(0)).forEach(t=>{
+        msg = msg + "\n-------------\nTeam " + t.n + "\nAvg Score: " + t.s.a + "\n" + t.s.p.join("\n")
+      })
+      bot.sendMessage(chatId,msg +"\n\nDisclaimer:\nThis shit is still in the works.\nFriends are left out for now.\nThe teams may end up uneven but the average scores of the teams are as close as mathematically possible")
+    })
+    // connection.query('select * from attendance where date = "' + date + '" order by userId', function (error, results, fields) {
+    //   shuffleArray(results)
+    //   let teamA = ""
+    //   let teamB = ""
+    //   let teamC = ""
+    //   let i = 0
+    //   results.forEach(row2 => {
+    //     i++
+    //     if (i % 3 == 0) {
+    //       teamA = teamA + row2.name + "\n"
+    //     } else if (i % 2 == 0) {
+    //       teamB = teamB + row2.name + "\n"
+    //     } else {
+    //       teamC = teamC + row2.name + "\n"
+    //     }
+    //   })
+    //   let res = teamA + "-------------\n" + teamB + "-------------\n" + teamC
+    //   var options = {
+    //     reply_markup: JSON.stringify({
+    //       inline_keyboard: [
+    //         [{ text: 'Shuffle Teams', callback_data: 's' }]
+    //       ]
+    //     })
+    //   };
+    //   bot.sendMessage(chatId, 'Creating teams for ' + date + "\nVotes to shuffle: 0\nNeed 4 votes to shuffle\n---------\n" + res, options);
+    // });
 
   }
 
