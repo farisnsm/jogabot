@@ -93,7 +93,7 @@ bot.on('message', (msg) => {
       teams.sort((a, b) => a.n.charCodeAt(0) - b.n.charCodeAt(0)).forEach(t=>{
         msg = msg + "\n-------------\nTeam " + t.n + "\nAvg Score: " + t.s.a + "\n" + t.s.p.join("\n")
       })
-      bot.sendMessage(chatId,msg +"\n\nDisclaimer:\nThis shit is still in the works.\nFriends are left out for now.\nThe teams may end up uneven but the average scores of the teams are as close as mathematically possible")
+      bot.sendMessage(chatId,msg +"\n\nDisclaimer:\nThis shit is still in the works.\nFriends are left out for now.\nThe teams may end up uneven but the average scores of the teams are as close as mathematically possible.\nShuffling Disabled")
     })
     // connection.query('select * from attendance where date = "' + date + '" order by userId', function (error, results, fields) {
     //   shuffleArray(results)
