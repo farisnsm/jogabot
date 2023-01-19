@@ -17,8 +17,12 @@ var connection = mysql.createPool({
 
 let rating = {}
 let addFriend = {}
-var latestList = require('./latestList.json')
-console.log(latestList)
+var latestList = {}
+connection.query('select * from list', function (error, results, fields) {
+  results.forEach(r => {
+    latestList[r.date] = { chatId: r.chatId, messageId: r.messageId }
+  })
+})
 function cancelTimeout() {
   connection.query('select 1', function (error, results, fields) {
     if (error) { console.log(error) } else { console.log(moment().format()) }
@@ -40,6 +44,12 @@ function random() {
   return Math.random() * (1.05 - 0.95) + 0.95;
 }
 
+function updateList(date,chatId,messageId){
+  let query = "insert into list (date,chatId,messageId) values ('"+date+"','"+chatId+"','"+messageId+"') on duplicate key update chatId = '" + chatId +"', messageId = '" + messageId + "'"
+  connection.query(query, function (error, results, fields) {
+    if (error) { console.log(error) } 
+  })
+}
 
 function ratingQuery(sessionDate) {
   return ("SELECT *,avg(rank) avg FROM heroku_722cb8a7f7c7056.ranking r left join attendance a on a.userId = r.telegramID2 where telegramID2 in (select userId from attendance where date = '" + sessionDate + "') and telegramID in (select userId from attendance where date = '" + sessionDate + "') group by userId order by avg")
@@ -60,7 +70,8 @@ bot.on('message', (msg) => {
     };
     Promise.all([bot.sendMessage(chatId, "Sooker on " + msg.text.substring(11), options)]).then(results => {
       latestList[msg.text.substring(11)] = { chatId: results[0].chat.id, messageId: results[0].message_id }
-      fs.writeFileSync('latestList.json', JSON.stringify(latestList));
+      updateList(msg.text.substring(11),results[0].chat.id,results[0].message_id)
+      
     })
   }
 
@@ -221,13 +232,13 @@ bot.on('message', (msg) => {
               //bot.sendMessage(addFriend[chatId].chatID, text2, options);
 
               bot.deleteMessage(latestList[addFriend[chatId].sdate].chatId, latestList[addFriend[chatId].sdate].messageId)
-              
+
               Promise.all([bot.sendMessage(addFriend[chatId].chatID, text2, options5)]).then(results => {
                 latestList[addFriend[chatId].sdate] = { chatId: results[0].chat.id, messageId: results[0].message_id }
-                fs.writeFileSync('latestList.json', JSON.stringify(latestList));
+                updateList(msg.text.substring(11),results[0].chat.id,results[0].message_id)
                 delete addFriend[chatId]
               })
-              
+
             });
           });
         })
@@ -292,7 +303,7 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
 
       Promise.all([bot.sendMessage(opts.chat_id, text, options)]).then(results => {
         latestList[sDate] = { chatId: results[0].chat.id, messageId: results[0].message_id }
-        fs.writeFileSync('latestList.json', JSON.stringify(latestList));
+        updateList(msg.text.substring(11),results[0].chat.id,results[0].message_id)
       })
     });
   }
@@ -300,7 +311,7 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
   if (actions[0] == 'vote') {
 
     rating[responder] = { userName: actions[2], userId: actions[1] }
-    
+
     connection.query(query, function (error, results, fields) {
       if (error) throw (error);
       bot.sendMessage(responder, "Please provide a rating for " + actions[2] + " from 0 (worst) to 10 (best)\n\nFor reference, your average rating is " + results[0].r)
@@ -390,7 +401,7 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
 
             Promise.all([bot.sendMessage(latestList[actions[1]].chatId, text3, options)]).then(results => {
               latestList[actions[1]] = { chatId: results[0].chat.id, messageId: results[0].message_id }
-              fs.writeFileSync('latestList.json', JSON.stringify(latestList));
+              updateList(msg.text.substring(11),results[0].chat.id,results[0].message_id)
             })
           });
         });
@@ -427,7 +438,7 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
 
             Promise.all([bot.sendMessage(actions[3], text3, options)]).then(results => {
               latestList[actions[5]] = { chatId: results[0].chat.id, messageId: results[0].message_id }
-              fs.writeFileSync('latestList.json', JSON.stringify(latestList));
+              updateList(msg.text.substring(11),results[0].chat.id,results[0].message_id)
             })
           });
         });
