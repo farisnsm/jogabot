@@ -177,7 +177,7 @@ bot.on('message', (msg) => {
           let players = []
           let temp = []
           results.forEach(r => {
-            temp.push({ text: "(" + (r.rank ? r.rank : 0) + ") " + r.name.split(" (")[0], callback_data: 'vote_' + r.userId + "_" + r.name })
+            temp.push({ text: "(" + (r.rank ? r.rank : 0) + ") " + r.name, callback_data: 'vote_' + r.userId + "_" + r.name })
             if (temp.length == 3) {
               players.push(temp)
               temp = []
