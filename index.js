@@ -47,7 +47,6 @@ function ratingQuery(sessionDate) {
 // Matches "/echo [whatever]"
 bot.on('message', (msg) => {
   const chatId = msg.chat.id;
-  console.log(msg)
   let text = msg.text
   //console.log(msg)
   if (msg.text.substring(0, 10) == 'create new') {
@@ -188,7 +187,6 @@ bot.on('message', (msg) => {
 
   if (addFriend.hasOwnProperty(chatId)) {
     if (!text.includes("/")) {
-      console.log(chatId)
       bot.sendMessage(chatId, "Invalid input. Registration aborted")
       delete addFriend[chatId]
     } else {
