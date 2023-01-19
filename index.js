@@ -234,7 +234,7 @@ bot.on('message', (msg) => {
 
               Promise.all([bot.sendMessage(addFriend[chatId].chatID, text2, options5)]).then(results => {
                 latestList[addFriend[chatId].sdate] = { chatId: results[0].chat.id, messageId: results[0].message_id }
-                updateList(msg.text.substring(11),results[0].chat.id,results[0].message_id)
+                updateList(addFriend[chatId].sdate,results[0].chat.id,results[0].message_id)
                 delete addFriend[chatId]
               })
 
@@ -302,7 +302,7 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
 
       Promise.all([bot.sendMessage(opts.chat_id, text, options)]).then(results => {
         latestList[sDate] = { chatId: results[0].chat.id, messageId: results[0].message_id }
-        updateList(msg.text.substring(11),results[0].chat.id,results[0].message_id)
+        updateList(sDate,results[0].chat.id,results[0].message_id)
       })
     });
   }
@@ -400,7 +400,7 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
 
             Promise.all([bot.sendMessage(latestList[actions[1]].chatId, text3, options)]).then(results => {
               latestList[actions[1]] = { chatId: results[0].chat.id, messageId: results[0].message_id }
-              updateList(msg.text.substring(11),results[0].chat.id,results[0].message_id)
+              updateList(actions[1],results[0].chat.id,results[0].message_id)
             })
           });
         });
@@ -437,7 +437,7 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
 
             Promise.all([bot.sendMessage(actions[3], text3, options)]).then(results => {
               latestList[actions[5]] = { chatId: results[0].chat.id, messageId: results[0].message_id }
-              updateList(msg.text.substring(11),results[0].chat.id,results[0].message_id)
+              updateList(actions[5],results[0].chat.id,results[0].message_id)
             })
           });
         });
