@@ -390,7 +390,7 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
 
             bot.deleteMessage(latestList[actions[1]].chatId, latestList[actions[1]].messageId)
 
-            Promise.all([bot.sendMessage(responder, text3, options)]).then(results => {
+            Promise.all([bot.sendMessage(latestList[actions[1]].chatId, text3, options)]).then(results => {
               latestList[actions[5]] = { chatId: results[0].chat.id, messageId: results[0].message_id }
               fs.writeFileSync('latestList.json', JSON.stringify(latestList));
             })
