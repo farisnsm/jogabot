@@ -112,40 +112,13 @@ bot.on('message', (msg) => {
       })
       bot.sendMessage(chatId, msg)
     })
-    // connection.query('select * from attendance where date = "' + date + '" order by userId', function (error, results, fields) {
-    //   shuffleArray(results)
-    //   let teamA = ""
-    //   let teamB = ""
-    //   let teamC = ""
-    //   let i = 0
-    //   results.forEach(row2 => {
-    //     i++
-    //     if (i % 3 == 0) {
-    //       teamA = teamA + row2.name + "\n"
-    //     } else if (i % 2 == 0) {
-    //       teamB = teamB + row2.name + "\n"
-    //     } else {
-    //       teamC = teamC + row2.name + "\n"
-    //     }
-    //   })
-    //   let res = teamA + "-------------\n" + teamB + "-------------\n" + teamC
-    //   var options = {
-    //     reply_markup: JSON.stringify({
-    //       inline_keyboard: [
-    //         [{ text: 'Shuffle Teams', callback_data: 's' }]
-    //       ]
-    //     })
-    //   };
-    //   bot.sendMessage(chatId, 'Creating teams for ' + date + "\nVotes to shuffle: 0\nNeed 4 votes to shuffle\n---------\n" + res, options);
-    // });
-
   }
 
   if (text == '/rating@joga_bot') {
     bot.sendMessage(msg.chat.id, "/rating only works in a DM with the bot, go to t.me/joga_bot to give ratings")
   }
   if (msg.chat.type == 'private' && text == '/start') {
-    bot.sendMessage(msg.chat.id, "Type or tap one of the options below\n\n/rating\n/managefriends")
+    bot.sendMessage(msg.chat.id, "Type or tap one of the options below\n\n/rating\n/deletefriend")
   }
   if (msg.chat.type == 'private' && text == '/rating') {
     connection.query("select * from attendance a left join ranking r on r.telegramID = '" + chatId + "' and r.telegramID2 = a.userId where userId != 'x' group by userId order by rank desc", function (error, results, fields) {
@@ -461,59 +434,7 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
           });
         });
       }
-      if (action == 's') {
-        date = msg.text.substring(19, 29)
-        connection.query("select * from teams where date = '" + date + "' and shuffle = '" + responder + "'", function (e, r, f) {
-          if (r.length == 0) {
-            connection.query("insert into teams values ('" + date + "','" + responder + "');select * from teams where date = '" + date + "' group by shuffle", function (error, results, fields) {
-              if (error) throw error;
-              bot.deleteMessage(opts.chat_id, opts.message_id)
-              let shuffleCount = results[1].length
-              //console.log(shuffleCount)
-              if (shuffleCount <= 3) {
-                let respText = "Creating teams for " + date + "\nVotes to shuffle: " + shuffleCount + "\nNeed 4 votes to shuffle" + msg.text.split('Need 4 votes to shuffle')[1]
-                var options = {
-                  reply_markup: JSON.stringify({
-                    inline_keyboard: [
-                      [{ text: 'Shuffle Teams', callback_data: 's' }]
-                    ]
-                  })
-                };
-                bot.sendMessage(opts.chat_id, respText, options);
-              } else {
-                //console.log(0)
-                connection.query('delete from teams where date = "' + date + '";select * from attendance where date = "' + date + '" order by userId', function (error, results, fields) {
-                  let arr = results[1]
-                  let teamA = ""
-                  let teamB = ""
-                  let teamC = ""
-                  let i = 0
-                  shuffleArray(arr)
-                  arr.forEach(row2 => {
-                    i++
-                    if (i % 3 == 0) {
-                      teamA = teamA + row2.name + "\n"
-                    } else if (i % 2 == 0) {
-                      teamB = teamB + row2.name + "\n"
-                    } else {
-                      teamC = teamC + row2.name + "\n"
-                    }
-                  })
-                  let res = teamA + "-------------\n" + teamB + "-------------\n" + teamC
-                  var options = {
-                    reply_markup: JSON.stringify({
-                      inline_keyboard: [
-                        [{ text: 'Shuffle Teams', callback_data: 's' }]
-                      ]
-                    })
-                  };
-                  bot.sendMessage(opts.chat_id, 'Creating teams for ' + date + "\nVotes to shuffle: 0\nNeed 4 votes to shuffle\n---------\n" + res, options);
-                });
-              }
-            });
-          }
-        })
-      }
+      
       if (actions[0] == 'df') {
         connection.query("delete from attendance where userId = '" + actions[1] + "' and id>=1;delete from ranking where telegramID not in (select userId from attendance)	 and id>0", function (e, r, f) {
           if (e) { console.log(e) } else {
