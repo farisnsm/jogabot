@@ -144,7 +144,7 @@ bot.on('message', (msg) => {
   if (text == '/rating@joga_bot') {
     bot.sendMessage(msg.chat.id, "/rating only works in a DM with the bot, go to t.me/joga_bot to give ratings")
   }
-  if (msg.chat.type == 'private' && text == '/rating') {
+  if (msg.chat.type == 'private' && text == '/start') {
     bot.sendMessage(msg.chat.id, "Type or tap one of the options below\n\n/rating\n/managefriends")
   }
   if (msg.chat.type == 'private' && text == '/rating') {
