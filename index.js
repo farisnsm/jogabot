@@ -43,10 +43,10 @@ function random() {
   return Math.random() * (1.05 - 0.95) + 0.95;
 }
 
-function updateList(date,chatId,messageId){
-  let query = "insert into list (date,chatId,messageId) values ('"+date+"','"+chatId+"','"+messageId+"') on duplicate key update chatId = '" + chatId +"', messageId = '" + messageId + "'"
+function updateList(date, chatId, messageId) {
+  let query = "insert into list (date,chatId,messageId) values ('" + date + "','" + chatId + "','" + messageId + "') on duplicate key update chatId = '" + chatId + "', messageId = '" + messageId + "'"
   connection.query(query, function (error, results, fields) {
-    if (error) { console.log(error) } 
+    if (error) { console.log(error) }
   })
 }
 
@@ -69,8 +69,8 @@ bot.on('message', (msg) => {
     };
     Promise.all([bot.sendMessage(chatId, "Sooker on " + msg.text.substring(11), options)]).then(results => {
       latestList[msg.text.substring(11)] = { chatId: results[0].chat.id, messageId: results[0].message_id }
-      updateList(msg.text.substring(11),results[0].chat.id,results[0].message_id)
-      
+      updateList(msg.text.substring(11), results[0].chat.id, results[0].message_id)
+
     })
   }
 
@@ -144,8 +144,10 @@ bot.on('message', (msg) => {
   if (text == '/rating@joga_bot') {
     bot.sendMessage(msg.chat.id, "/rating only works in a DM with the bot, go to t.me/joga_bot to give ratings")
   }
-
-  if (msg.chat.type == 'private' && text == '/start') {
+  if (msg.chat.type == 'private' && text == '/rating') {
+    bot.sendMessage(msg.chat.id, "Type or tap one of the options below\n\n/rating\n/managefriends")
+  }
+  if (msg.chat.type == 'private' && text == '/rating') {
     connection.query("select * from attendance a left join ranking r on r.telegramID = '" + chatId + "' and r.telegramID2 = a.userId where userId != 'x' group by userId order by rank desc", function (error, results, fields) {
       if (error) { console.log(error) } else {
         let players = []
@@ -164,6 +166,23 @@ bot.on('message', (msg) => {
           })
         };
         bot.sendMessage(msg.chat.id, "Who's rating do you want to give?\nYour current ratings for them is displayed beside their names", options3)
+      }
+    })
+  }
+
+  if (msg.chat.type == 'private' && text == '/deletefriend') {
+    connection.query("select * from attendance where friendId = '" + msg.chat.id + "' group by userId", function (error, results, fields) {
+      if (error) { console.log(error) } else {
+        let friends = [[{ text: "Cancel", callback_data: "cancel" }]]
+        results.forEach(r => {
+          friends.unshift([{ text: r.name, callback_data: 'df_' + r.userId }])
+        })
+        var options7 = {
+          reply_markup: JSON.stringify({
+            inline_keyboard: friends
+          })
+        };
+        bot.sendMessage(msg.chat.id, "Which friend do you want to delete? This will remove all records from the attendance list and their ratings\n(cannot be undone)", options7)
       }
     })
   }
@@ -234,7 +253,7 @@ bot.on('message', (msg) => {
 
               Promise.all([bot.sendMessage(addFriend[chatId].chatID, text2, options5)]).then(results => {
                 latestList[addFriend[chatId].sdate] = { chatId: results[0].chat.id, messageId: results[0].message_id }
-                updateList(addFriend[chatId].sdate,results[0].chat.id,results[0].message_id)
+                updateList(addFriend[chatId].sdate, results[0].chat.id, results[0].message_id)
                 delete addFriend[chatId]
               })
 
@@ -302,7 +321,7 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
 
       Promise.all([bot.sendMessage(opts.chat_id, text, options)]).then(results => {
         latestList[sDate] = { chatId: results[0].chat.id, messageId: results[0].message_id }
-        updateList(sDate,results[0].chat.id,results[0].message_id)
+        updateList(sDate, results[0].chat.id, results[0].message_id)
       })
     });
   }
@@ -400,7 +419,7 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
 
             Promise.all([bot.sendMessage(latestList[actions[1]].chatId, text3, options)]).then(results => {
               latestList[actions[1]] = { chatId: results[0].chat.id, messageId: results[0].message_id }
-              updateList(actions[1],results[0].chat.id,results[0].message_id)
+              updateList(actions[1], results[0].chat.id, results[0].message_id)
             })
           });
         });
@@ -437,7 +456,7 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
 
             Promise.all([bot.sendMessage(actions[3], text3, options)]).then(results => {
               latestList[actions[5]] = { chatId: results[0].chat.id, messageId: results[0].message_id }
-              updateList(actions[5],results[0].chat.id,results[0].message_id)
+              updateList(actions[5], results[0].chat.id, results[0].message_id)
             })
           });
         });
@@ -494,6 +513,15 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
             });
           }
         })
+      }
+      if (actions[0] == 'df') {
+        connection.query("delete from attendance where userId = '" + actions[1] + "' and id>=1;delete from ranking where telegramID not in (select userId from attendance)	 and id>0", function (e, r, f) {
+          if (e) { console.log(e) } else {
+            bot.deleteMessage(opts.chat_id, opts.message_id)
+            bot.sendMessage(responder, "Delete sucessful")
+          }
+        })
+
       }
       if (action == 'cancel') {
         bot.deleteMessage(opts.chat_id, opts.message_id)
