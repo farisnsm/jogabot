@@ -120,28 +120,7 @@ bot.on('message', (msg) => {
   if (msg.chat.type == 'private' && text == '/start') {
     bot.sendMessage(msg.chat.id, "Type or tap one of the options below\n\n/rating\n/deletefriend")
   }
-  if (msg.chat.type == 'private' && text == '/rating') {
-    connection.query("select * from attendance a left join ranking r on r.telegramID = '" + chatId + "' and r.telegramID2 = a.userId where userId != 'x' group by userId order by rank desc", function (error, results, fields) {
-      if (error) { console.log(error) } else {
-        let players = []
-        let temp = []
-        results.forEach(r => {
-          temp.push({ text: r.name + " (" + (r.rank ? r.rank : 0) + ")", callback_data: 'vote_' + r.userId + "_" + r.name })
-          if (temp.length == 3) {
-            players.push(temp)
-            temp = []
-          }
-        })
-        players.push(temp)
-        var options3 = {
-          reply_markup: JSON.stringify({
-            inline_keyboard: players
-          })
-        };
-        bot.sendMessage(msg.chat.id, "Who's rating do you want to give?\nYour current ratings for them is displayed beside their names", options3)
-      }
-    })
-  }
+  
 
   if (msg.chat.type == 'private' && text == '/deletefriend') {
     connection.query("select * from attendance where friendId = '" + msg.chat.id + "' group by userId", function (error, results, fields) {
