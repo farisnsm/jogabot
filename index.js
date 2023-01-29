@@ -324,7 +324,7 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
           } else {
             let friendsArr = [[{ text: "Add New Friend", callback_data: 'anf_' + opts.chat_id + '_' + opts.message_id + '_' + date }], [{ text: "Cancel", callback_data: "cancel" }]]
             results.forEach(r => {
-              friendsArr.unshift([{ text: r.name.split(" (" + responderName + ")").join(""), callback_data: 'af_' + r.name + '_' + r.userId + '_' + opts.chat_id + '_' + opts.message_id + '_' + date }])
+              friendsArr.unshift([{ text: r.name.split(" (" + responderName + ")").join(""), callback_data: 'af_' + r.name + '_' + r.userId + '_3_4_' + date }])
             })
             var options2 = {
               reply_markup: JSON.stringify({
@@ -406,7 +406,7 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
 
             bot.deleteMessage(latestList[actions[5]].chatId, latestList[actions[5]].messageId)
 
-            Promise.all([bot.sendMessage(actions[3], text3, options)]).then(results => {
+            Promise.all([bot.sendMessage(latestList[actions[1]].chatId, text3, options)]).then(results => {
               latestList[actions[5]] = { chatId: results[0].chat.id, messageId: results[0].message_id }
               updateList(actions[5], results[0].chat.id, results[0].message_id)
             })
