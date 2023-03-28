@@ -235,7 +235,7 @@ bot.on('message', (msg) => {
 
 bot.on('callback_query', function onCallbackQuery(callbackQuery) {
   //console.log(callbackQuery.message.text.substring(10))
-  console.log(callbackQuery)
+  //console.log(callbackQuery)
   isFriend = false
   const action = callbackQuery.data;
   let actions = action.split("_")
