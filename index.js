@@ -235,6 +235,7 @@ bot.on('message', (msg) => {
 
 bot.on('callback_query', function onCallbackQuery(callbackQuery) {
   //console.log(callbackQuery.message.text.substring(10))
+  console.log(callbackQuery)
   isFriend = false
   const action = callbackQuery.data;
   let actions = action.split("_")
@@ -399,6 +400,10 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
               i++
               text3 = text3 + "\n" + i + ": " + row2.name
             })
+            Promise.all([bot.sendMessage(latestList[actions[1]].chatId, text3, options)]).then(results => {
+              latestList[actions[5]] = { chatId: results[0].chat.id, messageId: results[0].message_id }
+              updateList(actions[5], results[0].chat.id, results[0].message_id)
+            })
             bot.deleteMessage(opts.chat_id, opts.message_id)
 
             //bot.deleteMessage(actions[3], actions[4])
@@ -406,10 +411,7 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
 
             bot.deleteMessage(latestList[actions[5]].chatId, latestList[actions[5]].messageId)
 
-            Promise.all([bot.sendMessage(latestList[actions[1]].chatId, text3, options)]).then(results => {
-              latestList[actions[5]] = { chatId: results[0].chat.id, messageId: results[0].message_id }
-              updateList(actions[5], results[0].chat.id, results[0].message_id)
-            })
+            
           });
         });
       }
