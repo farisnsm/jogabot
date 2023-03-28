@@ -4,7 +4,7 @@ const token = '835638437:AAF83B5cqieSeW4lh50VrZ42cwlhwXQqvGk'; //prod
 var moment = require('moment');
 const bot = new TelegramBot(token, { polling: true });
 var mysql = require('mysql2');
-
+var groupChatId = '-1001266182741'
 var connection = mysql.createPool({
   connectionLimit: 100,
   host: 'eu-cdbr-west-03.cleardb.net',
@@ -67,9 +67,9 @@ bot.on('message', (msg) => {
         ]
       })
     };
-    Promise.all([bot.sendMessage(chatId, "Sooker on " + msg.text.substring(11), options)]).then(results => {
-      latestList[msg.text.substring(11)] = { chatId: results[0].chat.id, messageId: results[0].message_id }
-      updateList(msg.text.substring(11), results[0].chat.id, results[0].message_id)
+    Promise.all([bot.sendMessage(groupChatId, "Sooker on " + msg.text.substring(11), options)]).then(results => {
+      latestList[msg.text.substring(11)] = { chatId: groupChatId, messageId: results[0].message_id }
+      updateList(msg.text.substring(11), groupChatId, results[0].message_id)
 
     })
   }
@@ -203,9 +203,9 @@ bot.on('message', (msg) => {
 
               bot.deleteMessage(latestList[addFriend[chatId].sdate].chatId, latestList[addFriend[chatId].sdate].messageId)
 
-              Promise.all([bot.sendMessage(addFriend[chatId].chatID, text2, options5)]).then(results => {
-                latestList[addFriend[chatId].sdate] = { chatId: results[0].chat.id, messageId: results[0].message_id }
-                updateList(addFriend[chatId].sdate, results[0].chat.id, results[0].message_id)
+              Promise.all([bot.sendMessage(groupChatId, text2, options5)]).then(results => {
+                latestList[addFriend[chatId].sdate] = { chatId: groupChatId, messageId: results[0].message_id }
+                updateList(addFriend[chatId].sdate, groupChatId, results[0].message_id)
                 delete addFriend[chatId]
               })
 
@@ -272,9 +272,9 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
       })
       bot.deleteMessage(latestList[sDate].chatId, latestList[sDate].messageId)
 
-      Promise.all([bot.sendMessage(opts.chat_id, text, options)]).then(results => {
-        latestList[sDate] = { chatId: results[0].chat.id, messageId: results[0].message_id }
-        updateList(sDate, results[0].chat.id, results[0].message_id)
+      Promise.all([bot.sendMessage(groupChatId, text, options)]).then(results => {
+        latestList[sDate] = { chatId: groupChatId, messageId: results[0].message_id }
+        updateList(sDate, groupChatId, results[0].message_id)
       })
     });
   }
@@ -370,9 +370,9 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
 
             bot.deleteMessage(latestList[actions[1]].chatId, latestList[actions[1]].messageId)
 
-            Promise.all([bot.sendMessage(latestList[actions[1]].chatId, text3, options)]).then(results => {
-              latestList[actions[1]] = { chatId: results[0].chat.id, messageId: results[0].message_id }
-              updateList(actions[1], results[0].chat.id, results[0].message_id)
+            Promise.all([bot.sendMessage(groupChatId, text3, options)]).then(results => {
+              latestList[actions[1]] = { chatId: groupChatId, messageId: results[0].message_id }
+              updateList(actions[1], groupChatId, results[0].message_id)
             })
           });
         });
@@ -400,9 +400,9 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
               i++
               text3 = text3 + "\n" + i + ": " + row2.name
             })
-            Promise.all([bot.sendMessage(latestList[actions[1]].chatId, text3, options)]).then(results => {
-              latestList[actions[5]] = { chatId: results[0].chat.id, messageId: results[0].message_id }
-              updateList(actions[5], results[0].chat.id, results[0].message_id)
+            Promise.all([bot.sendMessage(groupChatId, text3, options)]).then(results => {
+              latestList[actions[5]] = { chatId: groupChatId, messageId: results[0].message_id }
+              updateList(actions[5], groupChatId, results[0].message_id)
             })
             bot.deleteMessage(opts.chat_id, opts.message_id)
 
