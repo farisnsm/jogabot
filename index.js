@@ -184,7 +184,7 @@ bot.on('message', (msg) => {
             if (error) throw error;
             connection.query('select * from attendance where date = "' + addFriend[chatId].sdate + '" order by userId', function (error, results2, fields) {
               if (error) throw error;
-              let text2 = "Sooker on " + addFriend[chatId].sdate + "\n8.30PM at Orto, Yishun\n-----------------"
+              let text2 = "Sooker on " + addFriend[chatId].sdate + "\n8PM at Futsal Arena, Yishun\n-----------------"
               let i = 0
               results2.forEach(row2 => {
                 i++
@@ -244,7 +244,7 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
   let responderName = callbackQuery.from.first_name
   console.log(responderName, moment().format(), action)
   let date = msg.text.substring(10, 20)
-  let text = "Sooker on " + date + "\n8.30PM at Orto, Yishun\n-----------------"
+  let text = "Sooker on " + date + "\n8PM at Futsal Arena, Yishun\n-----------------"
   let query = "SELECT round(avg(rank),2) as r FROM heroku_722cb8a7f7c7056.ranking where telegramID2 = '" + responder + "'"
   const opts = {
     chat_id: msg.chat.id,
@@ -357,7 +357,7 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
           if (error) throw error;
           connection.query('select * from attendance where date = "' + actions[1] + '" order by userId', function (error, results, fields) {
             if (error) throw error;
-            let text3 = "Sooker on " + actions[1] + "\n8.30PM at Orto, Yishun\n-----------------"
+            let text3 = "Sooker on " + actions[1] + "\n8PM at Futsal Arena, Yishun\n-----------------"
             let i = 0
             results.forEach(row2 => {
               i++
@@ -394,7 +394,7 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
           if (error) throw error;
           connection.query('select * from attendance where date = "' + actions[5] + '" order by userId', function (error, results, fields) {
             if (error) throw error;
-            let text3 = "Sooker on " + actions[5] + "\n8.30PM at Orto, Yishun\n-----------------"
+            let text3 = "Sooker on " + actions[5] + "\n8PM at Futsal Arena, Yishun\n-----------------"
             let i = 0
             results.forEach(row2 => {
               i++
