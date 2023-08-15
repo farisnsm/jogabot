@@ -74,7 +74,7 @@ bot.on('message', (msg) => {
     })
   }
 
-  if (msg.text.substring(0, 12) == 'create teams') {
+  if (msg.text.substring(0, 12).toLowerCase() == 'create teams') {
     let date = msg.text.substring(13)
     //console.log(date)
     connection.query(ratingQuery(date), function (error, results, fields) {
