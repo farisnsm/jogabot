@@ -58,7 +58,7 @@ bot.on('message', (msg) => {
   const chatId = msg.chat.id;
   let text = msg.text
   //console.log(msg)
-  if (msg.text.substring(0, 10) == 'create new') {
+  if (msg.text.substring(0, 10).toLowerCase() == 'create new') {
     bot.sendMessage(chatId, 'Creating new session: ' + msg.text.substring(11));
     var options = {
       reply_markup: JSON.stringify({
