@@ -355,7 +355,7 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
       if (actions[0] == 'rf') {
         connection.query("update attendance set date = '99-99-9999' where id = " + actions[2], function (error, results, fields) {
           if (error) throw error;
-          connection.query('select * from attendance where date = "' + actions[1] + '" order by userId', function (error, results, fields) {
+          connection.query('select * from attendance where date = "' + actions[1] + '" order by id asc', function (error, results, fields) {
             if (error) throw error;
             let text3 = "Sooker on " + actions[1] + "\n8PM at Futsal Arena, Yishun\n-----------------"
             let i = 0
@@ -392,7 +392,7 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
       if (actions[0] == 'af') {
         connection.query("insert into attendance values ('" + actions[5] + "','" + actions[2] + "','" + actions[1] + "',0,'" + responder + "')", function (error, results, fields) {
           if (error) throw error;
-          connection.query('select * from attendance where date = "' + actions[5] + '" order by userId', function (error, results, fields) {
+          connection.query('select * from attendance where date = "' + actions[5] + '" order by id asc', function (error, results, fields) {
             if (error) throw error;
             let text3 = "Sooker on " + actions[5] + "\n8PM at Futsal Arena, Yishun\n-----------------"
             let i = 0
