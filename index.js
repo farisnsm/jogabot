@@ -263,7 +263,7 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
     })
   };
   function respond(sDate) {
-    connection.query('select * from attendance where date = "' + sDate + '" order by userId', function (error, results, fields) {
+    connection.query('select * from attendance where date = "' + sDate + '" order by id asc', function (error, results, fields) {
       if (error) throw error;
       let i = 0
       results.forEach(row2 => {
