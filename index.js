@@ -107,7 +107,7 @@ bot.on('message', (msg) => {
           teams[0].s.a = ((teams[0].s.a * (teams[0].s.p.length - 1)) + r.v) / (teams[0].s.p.length)
         }
         alt = !alt
-        if(teams[0].length == teamSize){
+        if(teams[0].s.p.length== teamSize){
           fullTeam.push(teams[0])
           teams.shift()
         }
