@@ -90,24 +90,29 @@ bot.on('message', (msg) => {
         { n: 'B', s: { a: 0, p: [] } },
         { n: 'C', s: { a: 0, p: [] } }
       ]
+      let fullTeam = []
       let alt = true
+      let teamSize = Math.ceil(b.length/3)
       b.forEach(r => {
         if (alt) {
           //good players
-          teams.sort((a, b) => (a.s.a - b.s.a) * ((5 - a.s.p.length) / (5 - a.s.p.length))) //get worst team
+          teams.sort((a, b) => (a.s.a - b.s.a)) //get worst team
           teams[0].s.p.push(r.name)
           teams[0].s.a = ((teams[0].s.a * (teams[0].s.p.length - 1)) + r.v) / (teams[0].s.p.length)
 
         } else {
-          teams.sort((a, b) => (b.s.a - a.s.a) * ((5 - a.s.p.length) / (5 - a.s.p.length))) //get best team
+          teams.sort((a, b) => (b.s.a - a.s.a) ) //get best team
           teams[0].s.p.push(r.name)
           teams[0].s.a = ((teams[0].s.a * (teams[0].s.p.length - 1)) + r.v) / (teams[0].s.p.length)
         }
         alt = !alt
-
+        if(teams[0].length == teamSize){
+          fullTeam.push(teams[0])
+          teams.shift()
+        }
       })
       let msg = "Teams for " + date
-      teams.sort((a, b) => a.n.charCodeAt(0) - b.n.charCodeAt(0)).forEach(t => {
+      fullTeam.sort((a, b) => a.n.charCodeAt(0) - b.n.charCodeAt(0)).forEach(t => {
         msg = msg + "\n-------------\nTeam " + t.n + "\nAvg Score: " + t.s.a.toFixed(2) + "\n" + t.s.p.join("\n")
       })
       bot.sendMessage(chatId, msg)
