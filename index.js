@@ -92,7 +92,8 @@ bot.on('message', (msg) => {
       ]
       let fullTeam = []
       let alt = true
-      let teamSize = Math.ceil(b.length/3)
+      let teamSize = Math.ceil(arr.length/3)
+      bot.sendMessage(chatId, "Max team size = " + teamSize)
       b.forEach(r => {
         if (alt) {
           //good players
