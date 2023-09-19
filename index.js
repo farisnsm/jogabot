@@ -92,8 +92,9 @@ bot.on('message', (msg) => {
       ]
       let fullTeam = []
       let alt = true
+      let t = 3
       let teamSize = Math.ceil(arr.length/3)
-      bot.sendMessage(chatId, "Max team size = " + teamSize)
+      //bot.sendMessage(chatId, "Max team size = " + teamSize)
       b.forEach(r => {
         if (alt) {
           //good players
@@ -110,10 +111,13 @@ bot.on('message', (msg) => {
         if(teams[0].s.p.length== teamSize){
           fullTeam.push(teams[0])
           teams.shift()
+          t--
+          teamSize = Math.ceil((arr.length - teamSize)/t)
         }
       })
+      fullTeam.forEach(t=> teams.push(t))
       let msg = "Teams for " + date
-      fullTeam.sort((a, b) => a.n.charCodeAt(0) - b.n.charCodeAt(0)).forEach(t => {
+      teams.sort((a, b) => a.n.charCodeAt(0) - b.n.charCodeAt(0)).forEach(t => {
         msg = msg + "\n-------------\nTeam " + t.n + "\nAvg Score: " + t.s.a.toFixed(2) + "\n" + t.s.p.join("\n")
       })
       bot.sendMessage(chatId, msg)
