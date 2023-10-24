@@ -54,6 +54,8 @@ function ratingQuery(sessionDate) {
   return ("SELECT *,avg(rank) avg FROM heroku_722cb8a7f7c7056.ranking r left join attendance a on a.userId = r.telegramID2 where telegramID2 in (select userId from attendance where date = '" + sessionDate + "') and telegramID in (select userId from attendance where date = '" + sessionDate + "') group by userId order by avg")
 }
 // Matches "/echo [whatever]"
+
+bot.sendMessage(200418207,'Bot started')
 bot.on('message', (msg) => {
   const chatId = msg.chat.id;
   let text = msg.text
@@ -177,7 +179,7 @@ bot.on('message', (msg) => {
   }
 
   if (text == "/notifyme"){
-    connection.query("insert into notify values ('" + msg.from.id + "')", function (error, results, fields) {
+    connection.query("insert ignore into notify values ('" + msg.from.id + "')", function (error, results, fields) {
       if (error) { console.log(error) } else {
         bot.sendMessage(msg.from.id,"You will be notified when a new session is created. Type or tap /unsubscribe to no longer be notified")
       }
