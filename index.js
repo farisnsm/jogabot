@@ -176,6 +176,14 @@ bot.on('message', (msg) => {
     }
   }
 
+  if (text == "/notifyme"){
+    connection.query("insert into notify values ('" + msg.from.id + "')", function (error, results, fields) {
+      if (error) { console.log(error) } else {
+        bot.sendMessage(msg.from.id,"You will be notified when a new session is created. Type or tap /unsubscribe to no longer be notified")
+      }
+    })
+  }
+
   if (addFriend.hasOwnProperty(chatId)) {
     if (!text.includes("/")) {
       bot.sendMessage(chatId, "Invalid input. Registration aborted")
@@ -192,11 +200,11 @@ bot.on('message', (msg) => {
         connection.query("insert into ranking values ('" + chatId + friendId + "','" + chatId + "','" + friendId + "','" + friendRating + "')", function (error, results, fields) {
           connection.query("insert into attendance values ('" + addFriend[chatId].sdate + "','" + friendId + "','" + friendName + "',0,'" + chatId + "')", function (error, results, fields) {
             if (error) throw error;
-            connection.query('select * from attendance where date = "' + addFriend[chatId].sdate + '" order by userId', function (error, results2, fields) {
+            connection.query('select * from attendance where date = "' + addFriend[chatId].sdate + '" order by id asc', function (error, results2, fields) {
               if (error) throw error;
               let text2 = "Sooker on " + addFriend[chatId].sdate + "\n8PM at Futsal Arena, Yishun\n-----------------"
               let i = 0
-              results2.forEach(row2 => {
+              results2.forEach(row2 => {  
                 i++
                 text2 = text2 + "\n" + i + ": " + row2.name
               })
