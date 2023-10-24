@@ -186,6 +186,14 @@ bot.on('message', (msg) => {
     })
   }
 
+  if (text == "/unsubscribe"){
+    connection.query("delete from notify where telegramID = '" + msg.from.id + "'", function (error, results, fields) {
+      if (error) { console.log(error) } else {
+        bot.sendMessage(msg.from.id,"You will no longer be notified when a new session is created. Tap or type /notifyme to be notified")
+      }
+    })
+  }
+
   if (addFriend.hasOwnProperty(chatId)) {
     if (!text.includes("/")) {
       bot.sendMessage(chatId, "Invalid input. Registration aborted")
