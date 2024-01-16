@@ -60,7 +60,7 @@ function updateList(date, chatId, messageId) {
 }
 
 function ratingQuery(sessionDate) {
-  return ("SELECT *,avg(rank) avg FROM heroku_115339abacdd65a.ranking r left join attendance a on a.userId = r.telegramID2 where telegramID2 in (select userId from attendance where date = '" + sessionDate + "') and telegramID in (select userId from attendance where date = '" + sessionDate + "') group by userId order by avg")
+  return ("SELECT *,avg(ranking.rank) avg FROM heroku_115339abacdd65a.ranking r left join attendance a on a.userId = r.telegramID2 where telegramID2 in (select userId from attendance where date = '" + sessionDate + "') and telegramID in (select userId from attendance where date = '" + sessionDate + "') group by userId order by avg")
 }
 // Matches "/echo [whatever]"
 
@@ -289,7 +289,7 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
   console.log(responderName, moment().format(), action)
   let date = msg.text.substring(10, 20)
   let text = "Sooker on " + date + "\nFutsal Arena, Yishun\n-----------------"
-  let query = "SELECT round(avg(rank),2) as r FROM heroku_115339abacdd65a.ranking where telegramID2 = '" + responder + "'"
+  let query = "SELECT round(avg(ranking.rank),2) as r FROM heroku_115339abacdd65a.ranking where telegramID2 = '" + responder + "'"
   const opts = {
     chat_id: msg.chat.id,
     message_id: msg.message_id,
@@ -424,7 +424,7 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
       }
 
       if (actions[0] == "anf") {
-        let query = "SELECT round(avg(rank),2) as r FROM heroku_115339abacdd65a.ranking where telegramID2 = '" + responder + "'"
+        let query = "SELECT round(avg(ranking.rank),2) as r FROM heroku_115339abacdd65a.ranking where telegramID2 = '" + responder + "'"
         connection.query(query, function (error, results, fields) {
           if (error) throw (error);
           bot.sendMessage(responder, "Beginning registration of a new friend...\n\nPlease key in your friends name and give them a rating(0 to 10) in the following format\nFriends Name / Rating\n\nFor reference, your average rating is " + results[0].r)
