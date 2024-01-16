@@ -1,16 +1,25 @@
 const TelegramBot = require('node-telegram-bot-api');
 const token = '835638437:AAF83B5cqieSeW4lh50VrZ42cwlhwXQqvGk'; //prod
 //const token = '5764854026:AAGjK2oDy_NZaEaO4JzDrU2LaeOw5pBq3F4' // dev
+//mysql://b04720c3182a0b:7ba0f217@eu-cluster-west-01.k8s.cleardb.net/heroku_115339abacdd65a?reconnect=true
 var moment = require('moment');
 const bot = new TelegramBot(token, { polling: true });
 var mysql = require('mysql2');
 var groupChatId = '-1001266182741'
+// var connection = mysql.createPool({
+//   connectionLimit: 100,
+//   host: 'eu-cdbr-west-03.cleardb.net',
+//   user: 'be0dbc49587e53',
+//   password: 'f7a660f5',
+//   database: 'heroku_115339abacdd65a',
+//   multipleStatements: true
+// });
 var connection = mysql.createPool({
   connectionLimit: 100,
-  host: 'eu-cdbr-west-03.cleardb.net',
-  user: 'be0dbc49587e53',
-  password: 'f7a660f5',
-  database: 'heroku_722cb8a7f7c7056',
+  host: 'eu-cluster-west-01.k8s.cleardb.net',
+  user: 'b04720c3182a0b',
+  password: '7ba0f217',
+  database: 'heroku_115339abacdd65a',
   multipleStatements: true
 });
 
@@ -51,7 +60,7 @@ function updateList(date, chatId, messageId) {
 }
 
 function ratingQuery(sessionDate) {
-  return ("SELECT *,avg(rank) avg FROM heroku_722cb8a7f7c7056.ranking r left join attendance a on a.userId = r.telegramID2 where telegramID2 in (select userId from attendance where date = '" + sessionDate + "') and telegramID in (select userId from attendance where date = '" + sessionDate + "') group by userId order by avg")
+  return ("SELECT *,avg(rank) avg FROM heroku_115339abacdd65a.ranking r left join attendance a on a.userId = r.telegramID2 where telegramID2 in (select userId from attendance where date = '" + sessionDate + "') and telegramID in (select userId from attendance where date = '" + sessionDate + "') group by userId order by avg")
 }
 // Matches "/echo [whatever]"
 
@@ -280,7 +289,7 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
   console.log(responderName, moment().format(), action)
   let date = msg.text.substring(10, 20)
   let text = "Sooker on " + date + "\nFutsal Arena, Yishun\n-----------------"
-  let query = "SELECT round(avg(rank),2) as r FROM heroku_722cb8a7f7c7056.ranking where telegramID2 = '" + responder + "'"
+  let query = "SELECT round(avg(rank),2) as r FROM heroku_115339abacdd65a.ranking where telegramID2 = '" + responder + "'"
   const opts = {
     chat_id: msg.chat.id,
     message_id: msg.message_id,
@@ -414,7 +423,7 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
       }
 
       if (actions[0] == "anf") {
-        let query = "SELECT round(avg(rank),2) as r FROM heroku_722cb8a7f7c7056.ranking where telegramID2 = '" + responder + "'"
+        let query = "SELECT round(avg(rank),2) as r FROM heroku_115339abacdd65a.ranking where telegramID2 = '" + responder + "'"
         connection.query(query, function (error, results, fields) {
           if (error) throw (error);
           bot.sendMessage(responder, "Beginning registration of a new friend...\n\nPlease key in your friends name and give them a rating(0 to 10) in the following format\nFriends Name / Rating\n\nFor reference, your average rating is " + results[0].r)
