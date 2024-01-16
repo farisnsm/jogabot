@@ -151,7 +151,7 @@ bot.on('message', (msg) => {
 
 
   if (msg.chat.type == 'private' && text == '/deletefriend') {
-    connection.query("select * from attendance where friendId = '" + msg.chat.id + "' group by userId", function (error, results, fields) {
+    connection.query("select attendance.name,attendance.userId from attendance where friendId = '" + msg.chat.id + "' group by attendance.name,attendance.userId", function (error, results, fields) {
       if (error) { console.log(error) } else {
         let friends = [[{ text: "Cancel", callback_data: "cancel" }]]
         results.forEach(r => {
