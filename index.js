@@ -64,7 +64,7 @@ function ratingQuery(sessionDate) {
 }
 // Matches "/echo [whatever]"
 
-bot.sendMessage(200418207,'Bot started')
+bot.sendMessage(200418207, 'Bot started')
 bot.on('message', (msg) => {
   const chatId = msg.chat.id;
   let text = msg.text
@@ -85,7 +85,7 @@ bot.on('message', (msg) => {
     })
     connection.query("select telegramID from notify group by telegramID", function (error, results, fields) {
       if (error) { console.log(error) } else {
-        results.forEach(r=> {
+        results.forEach(r => {
           bot.sendMessage(r.telegramID, "A new session was just created for " + msg.text.substring(11))
         })
       }
@@ -111,7 +111,7 @@ bot.on('message', (msg) => {
       let fullTeam = []
       let alt = true
       let t = 3
-      let teamSize = Math.ceil(arr.length/3)
+      let teamSize = Math.ceil(arr.length / 3)
       //bot.sendMessage(chatId, "Max team size = " + teamSize)
       b.forEach(r => {
         if (alt) {
@@ -121,19 +121,19 @@ bot.on('message', (msg) => {
           teams[0].s.a = ((teams[0].s.a * (teams[0].s.p.length - 1)) + r.v) / (teams[0].s.p.length)
 
         } else {
-          teams.sort((a, b) => (b.s.a - a.s.a) ) //get best team
+          teams.sort((a, b) => (b.s.a - a.s.a)) //get best team
           teams[0].s.p.push(r.name)
           teams[0].s.a = ((teams[0].s.a * (teams[0].s.p.length - 1)) + r.v) / (teams[0].s.p.length)
         }
         alt = !alt
-        if(teams[0].s.p.length== teamSize){
+        if (teams[0].s.p.length == teamSize) {
           fullTeam.push(teams[0])
           teams.shift()
           t--
-          teamSize = Math.ceil((arr.length - teamSize)/t)
+          teamSize = Math.ceil((arr.length - teamSize) / t)
         }
       })
-      fullTeam.forEach(t=> teams.push(t))
+      fullTeam.forEach(t => teams.push(t))
       let msg = "Teams for " + date
       teams.sort((a, b) => a.n.charCodeAt(0) - b.n.charCodeAt(0)).forEach(t => {
         msg = msg + "\n-------------\nTeam " + t.n + "\nAvg Score: " + t.s.a.toFixed(2) + "\n" + t.s.p.join("\n")
@@ -148,7 +148,7 @@ bot.on('message', (msg) => {
   if (msg.chat.type == 'private' && text == '/start') {
     bot.sendMessage(msg.chat.id, "Type or tap one of the options below\n\n/rating\n/deletefriend")
   }
-  
+
 
   if (msg.chat.type == 'private' && text == '/deletefriend') {
     connection.query("select * from attendance where friendId = '" + msg.chat.id + "' group by userId", function (error, results, fields) {
@@ -194,18 +194,18 @@ bot.on('message', (msg) => {
     }
   }
 
-  if (text == "/notifyme"){
+  if (text == "/notifyme") {
     connection.query("insert ignore into notify values ('" + msg.from.id + "')", function (error, results, fields) {
       if (error) { console.log(error) } else {
-        bot.sendMessage(msg.from.id,"You will be notified when a new session is created. Type or tap /unsubscribe to no longer be notified")
+        bot.sendMessage(msg.from.id, "You will be notified when a new session is created. Type or tap /unsubscribe to no longer be notified")
       }
     })
   }
 
-  if (text == "/unsubscribe"){
+  if (text == "/unsubscribe") {
     connection.query("delete from notify where telegramID = '" + msg.from.id + "'", function (error, results, fields) {
       if (error) { console.log(error) } else {
-        bot.sendMessage(msg.from.id,"You will no longer be notified when a new session is created. Tap or type /notifyme to be notified")
+        bot.sendMessage(msg.from.id, "You will no longer be notified when a new session is created. Tap or type /notifyme to be notified")
       }
     })
   }
@@ -230,7 +230,7 @@ bot.on('message', (msg) => {
               if (error) throw error;
               let text2 = "Sooker on " + addFriend[chatId].sdate + "\nFutsal Arena, Yishun\n-----------------"
               let i = 0
-              results2.forEach(row2 => {  
+              results2.forEach(row2 => {
                 i++
                 text2 = text2 + "\n" + i + ": " + row2.name
               })
@@ -356,7 +356,8 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
 
       if (action == '1' && count >= 1) {
         connection.query("select * from attendance where friendId = '" + responder + "' and date != '" + date + "' and userId not in (select userId from attendance where date = '" + date + "') group by userId", function (error, results, fields) {
-          if (results.length == 0) {
+          if (error) { console.log(error) }
+          else if (results.length == 0) {
 
             connection.query(query, function (error, results, fields) {
               if (error) throw (error);
@@ -455,11 +456,11 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
 
             bot.deleteMessage(latestList[actions[5]].chatId, latestList[actions[5]].messageId)
 
-            
+
           });
         });
       }
-      
+
       if (actions[0] == 'df') {
         connection.query("delete from attendance where userId = '" + actions[1] + "' and id>=1;delete from ranking where telegramID not in (select userId from attendance)	 and id>0", function (e, r, f) {
           if (e) { console.log(e) } else {
