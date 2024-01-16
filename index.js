@@ -385,7 +385,7 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
       if (action == -1 && count >= 2) {
         let friendsArr = [[{ text: "Cancel", callback_data: "cancel" }]]
         results.filter(r => r.userId != responder).forEach(r => {
-          friendsArr.unshift([{ text: r.name.split(" (" + responderName + ")").join(""), callback_data: "rf_" + date + "_" + r.id }])
+          friendsArr.unshift([{ text: r.name.split(" (" + responderName + ")").join(""), callback_data: "rf_" + date + "_" + r.ID }])
         })
         var options6 = {
           reply_markup: JSON.stringify({
