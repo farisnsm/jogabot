@@ -171,7 +171,7 @@ bot.on('message', (msg) => {
     if (msg.chat.type != 'private') {
       bot.sendMessage(msg.chat.id, "/rating only works in a DM with the bot, go to t.me/joga_bot to give ratings")
     } else {
-      connection.query("select * from attendance a left join ranking r on r.telegramID = '" + chatId + "' and r.telegramID2 = a.userId where userId != 'x' group by userId order by rank desc", function (error, results, fields) {
+      connection.query("select userId,r.rank,a.name from attendance a left join ranking r on r.telegramID = '" + chatId + "' and r.telegramID2 = a.userId where userId != 'x' group by userId,r.rank,a.name order by r.rank desc", function (error, results, fields) {
         if (error) { console.log(error) } else {
           let players = []
           let temp = []
