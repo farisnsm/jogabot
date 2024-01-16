@@ -266,7 +266,7 @@ bot.on('message', (msg) => {
       bot.sendMessage(chatId, "Invalid input. Rating aborted")
       delete rating[chatId]
     } else {
-      connection.query("insert into ranking values ('" + chatId + rating[chatId].userId + "','" + chatId + "','" + rating[chatId].userId + "','" + text + "') on duplicate key update rank = " + text, function (error, results, fields) {
+      connection.query("insert into ranking values ('" + chatId + rating[chatId].userId + "','" + chatId + "','" + rating[chatId].userId + "','" + text + "') on duplicate key update ranking.rank = " + text, function (error, results, fields) {
         if (error) { console.log(error) } else {
           bot.sendMessage(chatId, "You have succesfully updated your rating for " + rating[chatId].userName + "\nType or Tap /rating to provide another")
           delete rating[chatId]
