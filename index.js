@@ -96,6 +96,7 @@ bot.on('message', (msg) => {
     let date = msg.text.substring(13)
     //console.log(date)
     connection.query(ratingQuery(date), function (error, results, fields) {
+      if(error){console.log(error)}
       let arr = results.map(r => ({ name: r.name, v: r.avg * random() }))
       arr.sort((a, b) => a.v - b.v);
       let b = []
