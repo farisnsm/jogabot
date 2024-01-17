@@ -60,7 +60,7 @@ function updateList(date, chatId, messageId) {
 }
 
 function ratingQuery(sessionDate) {
-  return ("SELECT *,avg(ranking.rank) avg FROM heroku_115339abacdd65a.ranking r left join attendance a on a.userId = r.telegramID2 where telegramID2 in (select userId from attendance where date = '" + sessionDate + "') and telegramID in (select userId from attendance where date = '" + sessionDate + "') group by userId order by avg")
+  return ("SELECT a.name,a.userId,avg(ranking.rank) avg FROM heroku_115339abacdd65a.ranking r left join attendance a on a.userId = r.telegramID2 where telegramID2 in (select userId from attendance where date = '" + sessionDate + "') and telegramID in (select userId from attendance where date = '" + sessionDate + "') group by a.userId,a.name order by avg")
 }
 // Matches "/echo [whatever]"
 
