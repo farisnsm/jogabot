@@ -356,7 +356,7 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
       }
 
       if (action == '1' && count >= 1) {
-        connection.query("select userId from attendance where friendId = '" + responder + "' and date != '" + date + "' and userId not in (select userId from attendance where date = '" + date + "') group by userId", function (error, results, fields) {
+        connection.query("select userId,name from attendance where friendId = '" + responder + "' and date != '" + date + "' and userId not in (select userId from attendance where date = '" + date + "') group by userId,name", function (error, results, fields) {
           if (error) { console.log(error) }
           else if (results.length == 0) {
 
