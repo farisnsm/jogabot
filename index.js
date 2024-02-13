@@ -370,6 +370,7 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
 
           } else {
             let friendsArr = [[{ text: "Add New Friend", callback_data: 'anf_' + opts.chat_id + '_' + opts.message_id + '_' + date }], [{ text: "Cancel", callback_data: "cancel" }]]
+            console.log(results)
             results.forEach(r => {
               friendsArr.unshift([{ text: r.name.replace(" (" + responderName + ")",""), callback_data: 'af_' + r.name + '_' + r.userId + '_3_4_' + date }])
             })
