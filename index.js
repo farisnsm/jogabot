@@ -1,4 +1,6 @@
 const TelegramBot = require('node-telegram-bot-api');
+const puppeteer = require('puppeteer');
+
 const token = '835638437:AAF83B5cqieSeW4lh50VrZ42cwlhwXQqvGk'; //prod
 //const token = '5764854026:AAGjK2oDy_NZaEaO4JzDrU2LaeOw5pBq3F4' // dev
 //mysql://b04720c3182a0b:7ba0f217@eu-cluster-west-01.k8s.cleardb.net/heroku_115339abacdd65a?reconnect=true
@@ -60,15 +62,92 @@ function updateList(date, chatId, messageId) {
 }
 
 function ratingQuery(sessionDate) {
-  return ("SELECT *,avg(ranking.rank) avg FROM heroku_115339abacdd65a.ranking r left join attendance a on a.userId = r.telegramID2 where telegramID2 in (select userId from attendance where date = '" + sessionDate + "') and telegramID in (select userId from attendance where date = '" + sessionDate + "') group by userId order by avg")
+  return ("SELECT a.name,a.userId,avg(r.rank) avg FROM heroku_115339abacdd65a.ranking r left join attendance a on a.userId = r.telegramID2 where telegramID2 in (select userId from attendance where date = '" + sessionDate + "') and telegramID in (select userId from attendance where date = '" + sessionDate + "') group by a.userId,a.name order by avg")
 }
 // Matches "/echo [whatever]"
+
+async function ktm() {
+
+
+  const browser = await puppeteer.launch({
+      headless: true,
+      args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+      ],
+  });
+  let page = await browser.newPage();
+  await page.goto('https://shuttleonline.ktmb.com.my/Home/Shuttle', { waitUntil: 'networkidle2' })
+
+
+  try {
+      await page.waitForSelector('#validationSummaryModal > div > div > div.modal-body > div > div.text-center > button')
+      await page.click('#validationSummaryModal > div > div > div.modal-body > div > div.text-center > button')
+      await page.waitForSelector('#validationSummaryModal > div > div > div.modal-body > div > div.text-center > button', { hidden: true });
+  } catch {
+  
+  }
+  await new Promise(resolve => setTimeout(resolve, 2000));
+  
+  await page.click('#btnSubmit')
+
+  await page.waitForSelector('#theForm > div > div:nth-child(1) > i')
+  await page.click('#theForm > div > div:nth-child(1) > i')
+
+
+  await page.waitForSelector('#OnwardDate')
+  await page.click('#OnwardDate')
+
+  await page.waitForSelector('body > section > div > div.lightpick__months > section > div.lightpick__days > div:nth-child(34)')
+  await page.click('body > section > div > div.lightpick__months > section > div.lightpick__days > div:nth-child(34)')
+
+
+  await page.waitForSelector('#btnSubmit')
+  let data = await page.evaluate(() => {
+      return document.querySelector('#btnSubmit').innerText
+  })
+  await page.click('#btnSubmit')
+
+
+
+
+  await page.waitForSelector('body > div.container-fluid.body.plr0 > div.col-md-12 > div > div.col-md-10.col-sm-12.mt10 > div.DepartSection > div:nth-child(1) > div > div.padd1015.station-d.text-center')
+
+  let results = ""
+  for (let i = 1; i < 14; i++) {
+      let data2 = await page.evaluate((i) => {
+          let time = document.querySelector(`body > div.container-fluid.body.plr0 > div.col-md-12 > div > div.col-md-10.col-sm-12.mt10 > div.DepartSection > div:nth-child(3) > div > table > tbody > tr:nth-child(${i}) > td:nth-child(2)`).innerText
+          let seats = document.querySelector(`body > div.container-fluid.body.plr0 > div.col-md-12 > div > div.col-md-10.col-sm-12.mt10 > div.DepartSection > div:nth-child(3) > div > table > tbody > tr:nth-child(${i}) > td:nth-child(5)`).innerText
+          if (seats.trim() != "0") {
+              return (time + ":" + seats + "\n")
+          } else {
+              return ("")
+          }
+      }, i)
+      results = results + data2
+
+  }
+  console.log("Results\n"+results)
+  await page.close()
+  await browser.close()
+  return ("Results\n"+results)
+
+}
 
 bot.sendMessage(200418207, 'Bot started')
 bot.on('message', (msg) => {
   const chatId = msg.chat.id;
   let text = msg.text
   //console.log(msg)
+  
+  if (text.substring(0, 10).toLowerCase() == 'check'){
+    try{
+      bot.sendMessage(msg.chat.id,ktm())
+    } catch {
+      bot.sendMessage(msg.chat.id,"error")
+    }
+  }
+
   if (msg.text.substring(0, 10).toLowerCase() == 'create new') {
     bot.sendMessage(chatId, 'Creating new session: ' + msg.text.substring(11));
     var options = {
@@ -96,6 +175,7 @@ bot.on('message', (msg) => {
     let date = msg.text.substring(13)
     //console.log(date)
     connection.query(ratingQuery(date), function (error, results, fields) {
+      if(error){console.log(error)}
       let arr = results.map(r => ({ name: r.name, v: r.avg * random() }))
       arr.sort((a, b) => a.v - b.v);
       let b = []
@@ -355,7 +435,7 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
       }
 
       if (action == '1' && count >= 1) {
-        connection.query("select userId from attendance where friendId = '" + responder + "' and date != '" + date + "' and userId not in (select userId from attendance where date = '" + date + "') group by userId", function (error, results, fields) {
+        connection.query("select userId,name from attendance where friendId = '" + responder + "' and date != '" + date + "' and userId not in (select userId from attendance where date = '" + date + "') group by userId,name", function (error, results, fields) {
           if (error) { console.log(error) }
           else if (results.length == 0) {
 
@@ -369,8 +449,9 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
 
           } else {
             let friendsArr = [[{ text: "Add New Friend", callback_data: 'anf_' + opts.chat_id + '_' + opts.message_id + '_' + date }], [{ text: "Cancel", callback_data: "cancel" }]]
+            console.log(results)
             results.forEach(r => {
-              friendsArr.unshift([{ text: r.name.split(" (" + responderName + ")").join(""), callback_data: 'af_' + r.name + '_' + r.userId + '_3_4_' + date }])
+              friendsArr.unshift([{ text: r.name.replace(" (" + responderName + ")",""), callback_data: 'af_' + r.name + '_' + r.userId + '_3_4_' + date }])
             })
             var options2 = {
               reply_markup: JSON.stringify({
