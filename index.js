@@ -142,7 +142,7 @@ bot.on('message', (msg) => {
   
   if (text.substring(0, 10).toLowerCase() == 'check'){
     try{
-      bot.sendMessage(msg.chat.id,ktm())
+      bot.sendMessage(msg.chat.id,"success: " & ktm())
     } catch {
       bot.sendMessage(msg.chat.id,"error")
     }
